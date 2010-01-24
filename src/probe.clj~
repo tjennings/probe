@@ -1,0 +1,47 @@
+(ns probe)
+(use 'clojure.contrib.seq-utils)
+
+(defmacro property
+  ([doc]
+  `(println "Pending - " ~doc))
+
+  ([doc test]
+  `(if ~test
+     (println "passed! " '~test)
+     (println "failed! " '~test)))
+
+  ([doc data test]
+   `(let [x 10]
+      (if ~test
+       (println "passed! " '~test)
+       (println "failed! " '~test)))))
+
+
+;(defn gen-int
+;  "Generates a semi-random integer"
+;  []
+;  (rand 10))
+;
+;
+;
+;
+
+
+(defn test-expr [l r]
+  (println l)
+  (println "Hey we're in here!")
+  (if (= l r)
+    true
+    (throw (Exception. "Assertion failed!"))))
+
+(defn run-one-test [test-value assertion]
+   (binding [= test-expr]
+     (apply assertion (flatten (list test-value))))
+)
+
+;(run-one-test 1 (fn [x] (= (* x 2) (+ x x))))
+
+(defmacro for-all [generator bindings form]
+ `(run-one-test 
+    (~generator) (fn [~@bindings] ~form))
+)

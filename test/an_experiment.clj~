@@ -1,0 +1,7 @@
+(probe/run-one-test (g) 
+   (clojure.core/fn [x] 
+     (do 
+      (println "Equal is" = "test-expr is " test-expr " calls as " (test-expr 1 1))
+      (println (= = test-expr))
+      (println "Equal is" = "test-expr is " test-expr " calls as " (test-expr 1 1))
+)))
