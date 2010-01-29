@@ -1,5 +1,6 @@
 (ns probe-props
   (:use probe))
+Hello world
 
 ;; a pending property
 ;(property
@@ -31,6 +32,7 @@
 (testing
   (context "a suite of statements evaluating some doodad"
     (context "making some blanket assertions about arithmetic in clojure"
+      (it "A pending spec")
       (for-all g [x] (= (* x 2) (+ x x)))
       (for-all g [x] (< (* x 2) (+ x 2)))
     )

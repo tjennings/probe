@@ -69,7 +69,7 @@
         (do 
           (doseq [for-all-result stuff]
             (println red prefix for-all-result)))
-          )))
+          ))
    (print white))
 
 (defn testing [rest]
