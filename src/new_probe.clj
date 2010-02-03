@@ -1,25 +1,32 @@
 (ns new_probe)
+(use 'nested-printer)
+(use 'probe-core)
 (use 'clojure.contrib.seq-utils)
 
-(defn- is-pending [test]
-  (if (or (nil? test) (empty? test))
-     false
-     (:pending? test)))
-
-(defstruct test-info 
+(defstruct context-info
+  :type
   :doc
-  :tests
-  :pending?
-  :result)
+  :tests)
+
+(def default-context
+  (struct-map context-info
+    :type :context
+    :doc ""
+    :tests []))
+
+(def default-test
+  (struct-map context-info
+    :type :test
+    :doc ""
+    :tests []))
 
 (defstruct assertion-result
-  :type :assertion
+  :type
   :result
   :message)
 
 (defn assert-equality-message [result left right]
-  (if result
-    ()
+  (if (not result)
     (str "expected \"" left "\" but was \"" right "\"")))
 
 (defn assert-equality [left right]
@@ -28,8 +35,14 @@
       :result result
       :message (assert-equality-message result left right))))
 
-(defn run-one [test]
-  (let [result (eval (:tests test))]
+(defmulti run-one :type)
+
+(defmethod run-one :context [context]
+  (assoc context :tests
+    (map run-one (flatten [(:tests context)]))))
+
+(defmethod run-one :test [test]
+  (let [result (eval (first (:tests test)))]
     (if (contains? result :message) ;hacking this in for now
       (do
         (-> test
@@ -37,50 +50,23 @@
         (assoc :assertions result)))
       (assoc test :passed result))))
 
-(defn run [context]
-  (assoc context :tests
-    (map run-one (flatten [(:tests context)]))))
-
-(def red     "\033[31m")
-(def green   "\033[32m")
-(def green   "\033[32m")
-(def brown   "\033[33m")
-(def default "\033[0m")
-
-(defn nested-test-printer [context]
-  (if (:passed context)
-    (str green "  - " (:doc context) default)
-    (if-let [assertion (:assertions context)]
-      (str red "  - " (:doc context) " " (:message assertion) default)
-      (str red "  - " (:doc context) " " (:tests context) default))))
-
-(defn context-color [context]
-  (if (:pending? context)
-    brown
-    default))
-
-(defn nested-context-printer [context]
-  (str (context-color context) (:doc context) default "\n"
-    (apply str (map nested-printer (:tests context)))))
-
-(defn nested-printer [context]
-    (if (= :context (:type context))
-      (nested-context-printer context)
-      (if (= :test (:type context))
-        (str (nested-test-printer context) "\n"))))
+(defn run [context] (run-one context))
 
 (defn context
-  ([] {:type :context :doc "" :pending? true})
-  ([doc] {:type :context :doc doc :pending? true})
-  ([doc & children] {:type :context :doc doc :pending? (is-pending children) :tests (flatten [children])}))
+  ([doc] (assoc default-context :doc doc))
+  ([doc & children]
+   (assoc default-context :doc doc :tests children)))
 
 (defmacro it 
-  ([] (context))
-  ([doc] (context doc))
-  ([doc test] `{:type :test :doc ~doc :pending? false :tests '~test}))
+  ([doc] `(assoc default-test :doc ~doc))
+  ([doc & tests]
+   `(assoc default-test :doc ~doc :tests '[~@tests])))
+
+
+(defmacro pit 
+  ([doc & args] `(assoc default-test :doc ~doc)))
 
 (defn testing
-  ([] (context))
-  ([doc] (context doc))
-  ([doc & children]
-   (println (nested-printer (run (context doc children))))))
+  "acts as the outer context of all tests, meant to be hooked and overridden by runners"
+  [& args]
+  (println (nested-printer (run (apply context args)))))
