@@ -20,50 +20,40 @@
     :doc ""
     :tests []))
 
-(defstruct assertion-result
-  :type
-  :result
-  :message)
+(defn any?
+  "TODO: This has to be in lib somewhere?
+   Returns true if any element in the collection returns true for the predicate
+   function"
+  [pred coll]
+  (not (empty? (filter #(pred %) coll))))
 
-(defn assert-equality-message [result left right]
-  (if (not result)
-    (str "expected \"" left "\" but was \"" right "\"")))
+(defmulti run :type)
 
-(defn assert-equality [left right]
-  (let [result (= left right)]
-    (struct-map assertion-result
-      :result result
-      :message (assert-equality-message result left right))))
-
-(defmulti run-one :type)
-
-(defmethod run-one :context [context]
+(defmethod run :context [context]
   (assoc context :tests
-    (map run-one (flatten [(:tests context)]))))
+    (map run (flatten [(:tests context)]))))
 
-(defmethod run-one :test [test]
-  (let [result (eval (first (:tests test)))]
-    (if (contains? result :message) ;hacking this in for now
-      (do
-        (-> test
-        (assoc :passed (:result result))
-        (assoc :assertions result)))
-      (assoc test :passed result))))
-
-(defn run [context] (run-one context))
+(defmethod run :expects [it]
+  (try
+    (let [tests (:tests it)
+          expectations (flatten (map (fn [t] (:expectations t)) tests))
+          results (map (fn [e] (e)) expectations)
+          failed (any? #(not (= true %)) results)]
+      (assoc it :passed (not failed)))
+  (catch Exception e
+    (assoc it :passed false :error e))))
 
 (defn context
   ([doc] (assoc default-context :doc doc))
   ([doc & children]
    (assoc default-context :doc doc :tests children)))
 
-(defmacro it 
-  ([doc] `(assoc default-test :doc ~doc))
-  ([doc & tests]
-   `(assoc default-test :doc ~doc :tests '[~@tests])))
-
+(defn it
+  ([doc] (assoc default-test :type :expects :doc doc))
+  ([doc & tests] (assoc default-test :type :expects :doc doc :tests tests)))
 
 (defmacro pit 
+  "Mark a test pending"
   ([doc & args] `(assoc default-test :doc ~doc)))
 
 (defn testing

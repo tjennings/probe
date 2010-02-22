@@ -14,6 +14,15 @@
 
 (defmulti nested-printer :type)
 
+(defmethod nested-printer :expects
+  ([context] (nested-printer context ""))
+  ([context depth]
+    (if (is-pending context)
+      (str brown depth "- " (:doc context) default "\n")
+      (if (:passed context)
+        (str green depth "- " (:doc context) default "\n")
+        (str red depth "- " (:doc context) " " default "\n")))))
+
 (defmethod nested-printer :test
   ([context] (nested-printer context ""))
   ([context depth]

@@ -41,6 +41,7 @@
         <path location="${source.dir}"/>
       </classpath>
       <sysproperty key="clojure.compile.path" value="${build.dir}"/>
+      <arg value="probe.AssertionFailed"/>
     </java>
   </target>
 

@@ -1,96 +1,79 @@
 (ns new-probe-test
   (:use new_probe)
   (:use probe-core)
+  (:use expect)
   (:use nested-printer))
 
-(testing "basic framework features"
-  (it "preserves assertion forms"
-     (assert-equality
-       '(= 1 1)
-       (first (:tests (run-one (it "passes" (= 1 1)))))))
-
-  (it "reports passing tests"
-     (assert-equality
-       (str green "- passes" default "\n")
-       (nested-printer (run-one (it "passes" (= 1 1))))))
-
-  (it "reports failing tests"
-    (assert-equality
-      (str red "- fails expected \"1\" but was \"2\"" default "\n")
-      (nested-printer (run-one (it "fails" (assert-equality 1 2))))))
-
-  (it "allows let forms in the test body"
-     (assert-equality true
-     (:passed (run-one
-       (it "passes"
-         (let [x 1]
-           (= 1 x)))))))
-
+(testing "contexts"
   (it "outputs nested context values correctly"
-    (assert-equality (str default "outer" default "\n"
-                          green "  - " "inner" default "\n")
-                     (nested-printer
-                       (run
-                         (context "outer"
-                           (it "inner" (assert-equality 1 1)))))))
+    (expect (nested-printer
+               (run
+                 (context "outer"
+                   (it "inner" (expect (+ 1 1) to (equal 2))))))
+            to (equal (str default "outer" default "\n"
+                           green "  - " "inner" default "\n"))))
 
   (it "allows pending contexts"
     (let [actual (run (context "outer"))]
-      (assert-equality (str brown "outer" default "\n")
-                       (nested-printer actual))))
+      (expect (nested-printer actual)
+              to (equal (str brown "outer" default "\n")))))
 
   (it "allows pending tests in a context"
-      (assert-equality (str brown "c" default "\n"
-                            brown "  - inner" default "\n")
-                       (nested-printer (run (context "c" (it "inner"))))))
+      (expect (nested-printer (run (context "c" (it "inner"))))
+              to (equal (str brown "c" default "\n"
+                             brown "  - inner" default "\n"))))
 )
+
 
 (testing "nested printer"
   (it "prints a nested context with a test correctly"
-    (assert-equality (str brown "a" default "\n"
-                          brown "  b" default "\n"
-                          default "  c" default "\n"
-                          green "    - test" default "\n")
-                     (nested-printer
-                       (run
-                         (context "a"
-                            (context "b")
-                            (context "c"
-                              (it "test" (= 1 1))))))))
-)
+    (expect
 
-(defn two-fn [] 2)
-(def two 2)
+      (nested-printer
+        (run
+          (context "a"
+            (context "b")
+            (context "c"
+              (it "test" (expect (= 1 1) to (= true)))))))
 
-(testing "it"
- (it "captures the local scope" (= two (two-fn))))
+    to (equal 
+
+       (str brown "a" default "\n"
+            brown "  b" default "\n"
+            default "  c" default "\n"
+            green "    - test" default "\n")))))
 
 (testing "is-pending"
   (it "returns true for a pending test"
-    (= true (is-pending (it "is pending"))))
+    (expect (is-pending (it "is pending")) to (= true)))
 
   (it "returns false for an implemented test"
-    (= false (is-pending (it "passes" (= 2 2)))))
+    (expect  (is-pending (it "passes" (= 2 2))) to (= false)))
 
   (it "returns true for a pending context"
-    (= true (is-pending (context "pending"))))
+    (expect (is-pending (context "pending")) to (equal true)))
 
   (it "returns true for a pending nested context"
-    (= true (is-pending (context "pending" (context "still pending")))))
+    (expect
+      (is-pending (context "pending" (context "still pending")))
+     to (equal true)))
 
   (it "returns true for a pending nested context with a test"
-    (= true (is-pending (context "pending"
+    (expect
+      (is-pending (context "pending"
                           (context "still pending"
-                            (it "isn't workin"))))))
+                            (it "isn't workin"))))
+    to (equal true)))
 
   (it "returns true for a nested context with any pending children "
-    (= true (is-pending 
-              (run
-                (context "pending"
-                  (context "pending")
-                  (context "notpending"
-                    (it "is true" (= 1 1))))))))
-)
+    (expect 
+      (is-pending 
+        (run
+          (context "pending"
+            (context "pending")
+            (context "notpending"
+              (it "is true" (expect (= 1 1) to (= true)))))))
+     to (equal true))))
 
 (testing "exception handling")
 
@@ -98,11 +81,17 @@
   (context "generators")
   (context "defininig properties")
   (context "performance evaluation"
-    (context "executing time")
+    (context "timing execution")
     (context "big-O evaluation")))
 
 ;; Crazy syntax BHAG
 '(testing "the syntax"
+   (context "properties"
+     (property "first of a list is same as last of the reversal of the list"
+        (generators [a-seq (gen-seq gen-int)])
+        (expect (first a-seq))
+        (to (equal (last (reverse a-seq))))))
+
    (context "variations on its"
      (define [z 5])
 
