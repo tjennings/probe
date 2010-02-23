@@ -12,6 +12,35 @@
     brown
     default))
 
+(def default-summary {:time 0 :success 0 :failed 0 :errors 0})
+
+(defn combine-sums
+  ([] default-summary)
+  ([a, b]
+    {:time (+ (:time a) (:time b))
+     :success (+ (:success a) (:success b))
+     :failed (+ (:failed a) (:failed b))
+     :errors (+ (:errors a) (:errors b))}))
+
+(defmulti summary :type)
+
+(defmethod summary :context
+  ([context] (summary context default-summary))
+  ([context sums] (reduce combine-sums (map summary (:tests context)))))
+
+(defmethod summary :expects [it]
+  (assoc default-summary 
+    :time 0 ;; TODO - implement this
+    :success (if (:passed it) 1 0)
+    :failed (if (not (:passed it)) 1 0)
+    :errors (if (:errors it) 1 0)
+  ))
+
+(defn summary-printer [sum]
+  (str "Success " (:success sum)
+       " Failed " (:failed sum)
+       " Errors " (:errors sum)))
+
 (defmulti nested-printer :type)
 
 (defmethod nested-printer :expects

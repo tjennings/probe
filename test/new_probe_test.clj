@@ -1,47 +1,48 @@
 (ns new-probe-test
   (:use new_probe)
   (:use probe-core)
+  (:use probe.runner)
   (:use expect)
   (:use nested-printer))
 
 (testing "contexts"
   (it "outputs nested context values correctly"
-    (expect (nested-printer
-               (run
-                 (context "outer"
-                   (it "inner" (expect (+ 1 1) to (equal 2))))))
-            to (equal (str default "outer" default "\n"
-                           green "  - " "inner" default "\n"))))
+    (expect
+      (nested-printer
+        (run
+          (context "outer"
+            (it "inner" (expect (+ 1 1) to (equal 2))))))
+    to (equal
+      (str default "outer" default "\n"
+           green "  - " "inner" default "\n"))))
 
   (it "allows pending contexts"
-    (let [actual (run (context "outer"))]
-      (expect (nested-printer actual)
-              to (equal (str brown "outer" default "\n")))))
+    (expect
+      (nested-printer (run (context "outer")))
+    to (equal (str brown "outer" default "\n"))))
 
   (it "allows pending tests in a context"
-      (expect (nested-printer (run (context "c" (it "inner"))))
-              to (equal (str brown "c" default "\n"
-                             brown "  - inner" default "\n"))))
+      (expect
+        (nested-printer (run (context "c" (it "inner"))))
+      to (equal
+        (str brown "c" default "\n"
+             brown "  - inner" default "\n"))))
 )
-
 
 (testing "nested printer"
   (it "prints a nested context with a test correctly"
     (expect
-
       (nested-printer
         (run
           (context "a"
             (context "b")
             (context "c"
               (it "test" (expect (= 1 1) to (= true)))))))
-
     to (equal 
-
-       (str brown "a" default "\n"
-            brown "  b" default "\n"
-            default "  c" default "\n"
-            green "    - test" default "\n")))))
+      (str brown "a" default "\n"
+           brown "  b" default "\n"
+           default "  c" default "\n"
+           green "    - test" default "\n")))))
 
 (testing "is-pending"
   (it "returns true for a pending test"
@@ -51,7 +52,7 @@
     (expect  (is-pending (it "passes" (= 2 2))) to (= false)))
 
   (it "returns true for a pending context"
-    (expect (is-pending (context "pending")) to (equal true)))
+    (expect (is-pending (context "pending")) to (= true)))
 
   (it "returns true for a pending nested context"
     (expect
@@ -99,8 +100,8 @@
        (define [x 1
                 y 4])
        (expect (+ x y ))
-       (to (equal z))
-       (to (> x)))
+         (to (equal z))
+         (to (> x)))
 
      (it "can expect exceptions"
        (expect (/ 1 0 ))

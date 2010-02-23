@@ -1,6 +1,7 @@
 (ns new_probe)
 (use 'nested-printer)
 (use 'probe-core)
+(use 'probe.runner)
 (use 'clojure.contrib.seq-utils)
 
 (defstruct context-info
@@ -8,6 +9,8 @@
   :doc
   :tests)
 
+;; TODO: There has to be a reasonable way to do this
+;; in clojure
 (def default-context
   (struct-map context-info
     :type :context
@@ -19,29 +22,6 @@
     :type :test
     :doc ""
     :tests []))
-
-(defn any?
-  "TODO: This has to be in lib somewhere?
-   Returns true if any element in the collection returns true for the predicate
-   function"
-  [pred coll]
-  (not (empty? (filter #(pred %) coll))))
-
-(defmulti run :type)
-
-(defmethod run :context [context]
-  (assoc context :tests
-    (map run (flatten [(:tests context)]))))
-
-(defmethod run :expects [it]
-  (try
-    (let [tests (:tests it)
-          expectations (flatten (map (fn [t] (:expectations t)) tests))
-          results (map (fn [e] (e)) expectations)
-          failed (any? #(not (= true %)) results)]
-      (assoc it :passed (not failed)))
-  (catch Exception e
-    (assoc it :passed false :error e))))
 
 (defn context
   ([doc] (assoc default-context :doc doc))
@@ -59,4 +39,6 @@
 (defn testing
   "acts as the outer context of all tests, meant to be hooked and overridden by runners"
   [& args]
-  (println (nested-printer (run (apply context args)))))
+  (let [results (run (apply context args))]
+    (println (nested-printer results))
+    (println (summary-printer (summary results)))))
