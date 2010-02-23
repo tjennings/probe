@@ -32,9 +32,16 @@
          (expect (+ 1 1) to (= 2))
          (expect (+ 2 3) to (equal 4))))
 
+  (context "not - expect the inverse of an assertion"
+    (pit "works for simple predicates"
+        (expect (+ 1 1) to (not! (= 3))))
+    (it "works for framework assertions"))
+
   (context "the equal assertion"
     (it "returns true when the assertion passes"
         (expect (equal 3 3) to (= true)))
     (it "throws an AssertionFailedException when the assertion fails"
-        (expect (equal 2 3) to (throw-error probe.AssertionFailed))))
+        (expect (equal 2 3) to (throw-error probe.AssertionFailed)))
+    (pit "can expect that an exception is NOT! thrown"
+        (expect (equal 2 2) to (not! (throw-error probe.AssertionFailed)))))
 )

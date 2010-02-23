@@ -26,6 +26,11 @@
     `{:type :expect
      :expectations (list ~@expectations)}))
 
+(defmacro not! [assertion test]
+  '(try
+     (not ~(conj assertion [test]))
+   (catch probe.AssertionFailed e
+     true)))
               
 (defn fail [message]
   (throw (new probe.AssertionFailed

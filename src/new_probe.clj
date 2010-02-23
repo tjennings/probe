@@ -19,7 +19,7 @@
 
 (def default-test
   (struct-map context-info
-    :type :test
+    :type :expects
     :doc ""
     :tests []))
 
@@ -34,7 +34,7 @@
 
 (defmacro pit 
   "Mark a test pending"
-  ([doc & args] `(assoc default-test :doc ~doc)))
+  ([doc & args] `(assoc default-test :type :expects :doc ~doc)))
 
 (defn testing
   "acts as the outer context of all tests, meant to be hooked and overridden by runners"

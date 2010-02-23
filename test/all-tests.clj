@@ -17,7 +17,7 @@
    by creating an artificial context in which all of our
    collected tests will be contained"
   [tests]
-  (let [args (cons "" tests)]
+  (let [args (cons "All-Tests" tests)]
     (apply testing args)))
 
 (binding [testing collecting-tests]
