@@ -4,9 +4,6 @@
 (defn remove-noise-words [tos]
   (filter #(not (= 'to %)) tos)) ;;TODO - ugly! what's the inverse of filter?
 
-(defn execute-expect [expect]
-  )
-
 (defmacro quoted-fn [& args] `(list 'fn [~@args]))
 
 ;;TODO - There MUST be a lib function for this
@@ -26,13 +23,18 @@
     `{:type :expect
      :expectations (list ~@expectations)}))
 
-(defmacro not! [assertion test]
-  '(try
-     (not ~(conj assertion [test]))
-   (catch probe.AssertionFailed e
-     true)))
+(defmacro not!
+  "TODO - We need to do some magic to make this work for throw-error"
+  [assertion test]
+  (let [complete-assertion (append assertion test)]
+    `(try
+       (not ~complete-assertion)
+     (catch probe.AssertionFailed e#
+       true))))
               
-(defn fail [message]
+(defn fail
+  "TODO - need to clean up probe.AssertFailed (it no longer takes arguments"
+  [message]
   (throw (new probe.AssertionFailed
               message
               [nil nil])))

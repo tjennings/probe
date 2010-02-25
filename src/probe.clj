@@ -1,4 +1,4 @@
-(ns new_probe)
+(ns probe)
 (use 'nested-printer)
 (use 'probe-core)
 (use 'probe.runner)
@@ -41,4 +41,5 @@
   [& args]
   (let [results (run (apply context args))]
     (println (nested-printer results))
+    (println (failure-printer results))
     (println (summary-printer (summary results)))))

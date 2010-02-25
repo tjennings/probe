@@ -25,8 +25,7 @@
 (defmulti summary :type)
 
 (defmethod summary :context
-  ([context] (summary context default-summary))
-  ([context sums] (reduce combine-sums (map summary (:tests context)))))
+  ([context] (summary context default-summary)) ([context sums] (reduce combine-sums (map summary (:tests context))))) 
 
 (defmethod summary :expects [it]
   (assoc default-summary 
@@ -37,9 +36,31 @@
   ))
 
 (defn summary-printer [sum]
-  (str "Success " (:success sum)
-       " Failed " (:failed sum)
-       " Errors " (:errors sum)))
+  (str (:success sum) " Success " 
+       (:failed sum) " Failed " 
+       (:errors sum) " Errors "))
+
+;; how to print a back trace:
+;; (reduce (fn [a b] (str a "\n" b)) (.getStackTrace error))
+;;
+(defn format-errors [error]
+  (if error
+    (str "\n    " (.getMessage error))))
+
+(defmulti failure-printer :type)
+
+(defmethod failure-printer :context
+  ([context] (failure-printer context ""))
+  ([context doc]
+  (apply str (doall (map #(failure-printer % (str doc " " (:doc context))) (:tests context))))))
+
+(defmethod failure-printer :expects
+  ([it] (failure-printer it ""))
+  ([it doc]
+    (if (not (:passed it))
+      (str red doc " " (:doc it) default
+           (format-errors (:error it))
+           "\n\n"))))
 
 (defmulti nested-printer :type)
 
@@ -51,17 +72,6 @@
       (if (:passed context)
         (str green depth "- " (:doc context) default "\n")
         (str red depth "- " (:doc context) " " default "\n")))))
-
-(defmethod nested-printer :test
-  ([context] (nested-printer context ""))
-  ([context depth]
-    (if (is-pending context)
-      (str brown depth "- " (:doc context) default "\n")
-      (if (:passed context)
-        (str green depth "- " (:doc context) default "\n")
-        (if-let [assertion (:assertions context)]
-          (str red depth "- " (:doc context) " " (:message assertion) default "\n")
-          (str red depth "- " (:doc context) " " default "\n"))))))
 
 (defmethod nested-printer :context 
   ([context] (nested-printer context ""))

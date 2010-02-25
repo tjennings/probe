@@ -1,5 +1,5 @@
 (ns all-tests)
-(use 'new_probe)
+(use 'probe)
 
 (def collected-tests (ref []))
 
@@ -23,7 +23,7 @@
 (binding [testing collecting-tests]
   ;;TOOD: Obv. this needs to be generalized into some kind of 
   ;;collecting test runner we can easily invoke
-  (load "new_probe_test")
-  (load "expect_test"))
+  (load "probe_test")
+  )
 
 (run-collected-tests (deref collected-tests))

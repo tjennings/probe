@@ -1,5 +1,5 @@
-(ns new-probe-test
-  (:use new_probe)
+(ns probe-test
+  (:use probe)
   (:use probe-core)
   (:use probe.runner)
   (:use expect)
@@ -75,6 +75,12 @@
             (context "notpending"
               (it "is true" (expect (= 1 1) to (= true)))))))
      to (equal true))))
+
+(testing "expect"
+  (it "returns true when the assertion passes"
+      (expect (equal 3 3) to (= true)))
+  (it "throws an AssertionFailedException when the assertion fails"
+      (expect (equal 2 3) to (throw-error probe.AssertionFailed))))
 
 (testing "exception handling")
 

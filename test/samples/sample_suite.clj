@@ -7,7 +7,7 @@
 
 (defn add-two [x] (+ 2 x))
 
-(testing "core behavior - tests begnning with 'fail' SHOULD FAIL!!"
+(testing "showcasing some core behavior"
   (it "works" (expect (+ 2 1) to (equal 3)))
   (it "fails" (expect (+ 1 1) to (equal 3)))
 
@@ -33,15 +33,7 @@
          (expect (+ 2 3) to (equal 4))))
 
   (context "not - expect the inverse of an assertion"
-    (pit "works for simple predicates"
+    (it "works for simple predicates"
         (expect (+ 1 1) to (not! (= 3))))
-    (it "works for framework assertions"))
-
-  (context "the equal assertion"
-    (it "returns true when the assertion passes"
-        (expect (equal 3 3) to (= true)))
-    (it "throws an AssertionFailedException when the assertion fails"
-        (expect (equal 2 3) to (throw-error probe.AssertionFailed)))
-    (pit "can expect that an exception is NOT! thrown"
-        (expect (equal 2 2) to (not! (throw-error probe.AssertionFailed)))))
-)
+    (it "works for framework assertions"
+        (expect (+ 2 3) to (not! (equal 3))))))
