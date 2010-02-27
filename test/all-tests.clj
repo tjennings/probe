@@ -25,6 +25,7 @@
   ;;TOOD: Obv. this needs to be generalized into some kind of 
   ;;collecting test runner we can easily invoke
   (load "probe_test")
+  (load "test_finder_test")
   )
 
 (run-collected-tests (deref collected-tests))
