@@ -1,6 +1,6 @@
 (ns probe-test
   (:use probe)
-  (:use probe-core)
+  (:use probe.core)
   (:use probe.runner)
   (:use expect)
   (:use nested-printer))
@@ -82,7 +82,10 @@
   (it "throws an AssertionFailedException when the assertion fails"
       (expect (equal 2 3) to (throw-error probe.AssertionFailed))))
 
-(testing "exception handling")
+(testing "exception handling"
+  (it "catches errors and reports them")
+  (it "allows you to expect an exception")
+  (it "allows you to expect that an exception is NOT thrown"))
 
 (testing "evaluation of properties"
   (context "generators")

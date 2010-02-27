@@ -1,6 +1,6 @@
-(ns expect-test
-  (:use new_probe)
-  (:use probe-core)
+(ns sample-suite
+  (:use probe)
+  (:use probe.core)
   (:use expect)
   (:use clojure.contrib.seq-utils)
   (:use nested-printer))

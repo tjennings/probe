@@ -1,5 +1,6 @@
 (ns probe.runner)
-(use 'probe-core)
+(use 'probe.core)
+(use 'probe.util)
 (use 'clojure.contrib.seq-utils)
 
 (defmulti run :type)

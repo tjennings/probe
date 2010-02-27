@@ -1,6 +1,6 @@
 (ns nested-printer)
 (use 'clojure.contrib.seq-utils)
-(use 'probe-core)
+(use 'probe.core)
 
 (def red     "\033[31m")
 (def green   "\033[32m")
