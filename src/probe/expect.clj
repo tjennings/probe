@@ -1,4 +1,4 @@
-(ns expect
+(ns probe.expect
   (:use clojure.contrib.seq-utils))
 
 (defn remove-noise-words [tos]
