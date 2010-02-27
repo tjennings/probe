@@ -1,5 +1,6 @@
 (ns all-tests)
 (use 'probe)
+(use 'probe.test-finder)
 (use 'probe.nested-runner)
 
 (def collected-tests (ref []))
@@ -22,10 +23,7 @@
     (apply testing args)))
 
 (binding [testing collecting-tests]
-  ;;TOOD: Obv. this needs to be generalized into some kind of 
-  ;;collecting test runner we can easily invoke
-  (load "probe_test")
-  (load "test_finder_test")
-  )
-
+  (doseq [file (find-tests "./test")]
+    (load file)))
+    
 (run-collected-tests (deref collected-tests))
