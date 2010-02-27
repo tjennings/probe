@@ -4,8 +4,6 @@
 (use 'probe.test-finder)
 (use 'clojure.contrib.seq-utils)
 
-(println (find-tests "./test/runner_tests"))
-
 (testing "the test finder"
   (it "finds the tests in the runner_tests folder"
     (expect (empty? (find-tests "./test/runner_tests")) to (equal false))
