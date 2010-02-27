@@ -1,0 +1,8 @@
+- How to support single-arg assertions like: is the list empty?
+
+(it "finds the tests in the runner_tests folder"
+  (expect (find-tests "./runner_tests")
+   to (be_empty) <<<<<<<< ??????
+   to (equal '("suite_one.clj")))))
+   
+- Assertion failures should report the line number they're failing on
