@@ -1,5 +1,4 @@
 (ns probe.core)
-(use 'nested-printer)
 (use 'probe.core)
 (use 'probe.runner)
 (use 'clojure.contrib.seq-utils)
@@ -54,10 +53,3 @@
   "Mark a test pending"
   ([doc & args] `(assoc default-test :type :expects :doc ~doc)))
 
-(defn testing
-  "acts as the outer context of all tests, meant to be hooked and overridden by runners"
-  [& args]
-  (let [results (run (apply context args))]
-    (println (nested-printer results))
-    (println (failure-printer results))
-    (println (summary-printer (summary results)))))

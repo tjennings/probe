@@ -1,9 +1,8 @@
-(ns probe-test
-  (:use probe)
-  (:use probe.core)
-  (:use probe.runner)
-  (:use expect)
-  (:use nested-printer))
+(ns probe-test)
+(use 'probe)
+(use 'probe.nested-runner)
+(use 'expect)
+(use 'nested-printer)
 
 (testing "contexts"
   (it "outputs nested context values correctly"
