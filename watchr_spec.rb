@@ -4,6 +4,8 @@
 watch( "^src/.*\.clj"   ) { |m| system("time ./bin/runtests.sh")}
 watch( "^test/.*\.clj"   ) { |m| system("time ./bin/runtests.sh")}
 
+system("time ./bin/runtests.sh")
+
 # --------------------------------------------------
 # Signal Handling
 # --------------------------------------------------
