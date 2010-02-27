@@ -1,7 +1,6 @@
 (ns all-tests)
 (use 'probe)
 (use 'probe.test-finder)
-(use 'probe.nested-runner)
 
 (def collected-tests (ref []))
 

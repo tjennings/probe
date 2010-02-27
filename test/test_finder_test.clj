@@ -1,6 +1,5 @@
 (ns test-finder-test)
 (use 'probe)
-(use 'probe.nested-runner)
 (use 'probe.test-finder)
 (use 'clojure.contrib.seq-utils)
 

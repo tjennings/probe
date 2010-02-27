@@ -1,6 +1,5 @@
 (ns probe-test)
 (use 'probe)
-(use 'probe.nested-runner)
 (use 'probe.nested-printer)
 
 (testing "contexts"
