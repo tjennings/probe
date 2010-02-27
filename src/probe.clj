@@ -1,5 +1,4 @@
 (ns probe)
-(use 'nested-printer)
 (use 'clojure.contrib.seq-utils)
 
 (defn- migrate

@@ -2,7 +2,7 @@
 (use 'probe)
 (use 'probe.nested-runner)
 (use 'expect)
-(use 'nested-printer)
+(use 'probe.nested-printer)
 
 (testing "contexts"
   (it "outputs nested context values correctly"
