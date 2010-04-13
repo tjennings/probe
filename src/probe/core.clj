@@ -3,6 +3,26 @@
 (use 'probe.runner)
 (use 'clojure.contrib.seq-utils)
 
+;; The two default data structures are defined below
+;; Everything is stored as either a context or a test.
+
+(defstruct context-info
+  :type
+  :doc
+  :tests)
+
+(def default-context
+  (struct-map context-info
+    :type :context
+    :doc ""
+    :tests []))
+
+(def default-test
+  (struct-map context-info
+    :type :expects
+    :doc ""
+    :tests []))
+
 (defmulti pending-for-type :type)
 
 (defmethod pending-for-type :context [context]
@@ -19,26 +39,9 @@
 
 (defn is-pending [coll]
   (let [result (find-first pending-for-type (flatten [coll]))]
-    (not (or (nil? result) (empty? result)))))
+    (not (or (nil? result)
+             (empty? result)))))
 
-(defstruct context-info
-  :type
-  :doc
-  :tests)
-
-;; TODO: There has to be a reasonable way to do this
-;; in clojure
-(def default-context
-  (struct-map context-info
-    :type :context
-    :doc ""
-    :tests []))
-
-(def default-test
-  (struct-map context-info
-    :type :expects
-    :doc ""
-    :tests []))
 
 (defn context
   ([doc] (assoc default-context :doc doc))

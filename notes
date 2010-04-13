@@ -2,7 +2,7 @@
 
 (it "finds the tests in the runner_tests folder"
   (expect (find-tests "./runner_tests")
-   to (be_empty) <<<<<<<< ??????
+   to (be :empty) <<<<<<<< ??????
    to (equal '("suite_one.clj")))))
    
 - Assertion failures should report the line number they're failing on
