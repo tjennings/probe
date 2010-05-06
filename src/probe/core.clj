@@ -42,17 +42,21 @@
     (not (or (nil? result)
              (empty? result)))))
 
+(defmacro with [bindings & body]
+  `(let ~bindings [~@body]))
 
 (defn context
   ([doc] (assoc default-context :doc doc))
   ([doc & children]
-   (assoc default-context :doc doc :tests children)))
+   (if (= doc "many assertions on arithmetic operations")
+     (println children))
+   (assoc default-context :doc doc :tests (flatten children))))
 
 (defn it
-  ([doc] (assoc default-test :type :expects :doc doc))
-  ([doc & tests] (assoc default-test :type :expects :doc doc :tests tests)))
+  ([doc] (assoc default-test :doc doc))
+  ([doc & tests] (assoc default-test :doc doc :tests tests)))
 
 (defmacro pit 
   "Mark a test pending"
-  ([doc & args] `(assoc default-test :type :expects :doc ~doc)))
+  ([doc & args] `(assoc default-test :doc ~doc)))
 

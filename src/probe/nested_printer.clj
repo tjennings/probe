@@ -45,7 +45,7 @@
 ;;
 (defn format-errors [error]
   (if error
-    (str "\n    " (.getMessage error))))
+    (str "\n    " (.getMessage error) "\n" (reduce (fn [s, e] (str s "\n" e)) (.getStackTrace error) ))))
 
 (defmulti failure-printer :type)
 
